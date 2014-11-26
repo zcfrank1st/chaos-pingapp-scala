@@ -7,7 +7,7 @@ import com.google.gson.{FieldNamingPolicy, GsonBuilder}
  */
 
 abstract class PingppObject {
-  final val PRETTY_PRINT_GSON = new GsonBuilder().
+  final var PRETTY_PRINT_GSON = new GsonBuilder().
     setPrettyPrinting().
     serializeNulls().
     setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).

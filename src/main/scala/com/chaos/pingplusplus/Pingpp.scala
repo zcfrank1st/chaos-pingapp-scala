@@ -11,7 +11,7 @@ object Pingpp {
     @volatile
     var apiVersion: String = "2014-10-10"
     @volatile
-    private var verifySSL: Boolean = true
+    var verifySSL: Boolean = true
     @volatile
-    private var apiBase: String = LIVE_API_BASE
+    var apiBase: String = LIVE_API_BASE
 }

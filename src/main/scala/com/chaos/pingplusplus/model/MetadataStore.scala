@@ -1,14 +1,16 @@
 package com.chaos.pingplusplus.model
 
+import scala.collection.mutable
+
 /**
  * Created by zcfrank1st on 11/14/14.
  */
 trait MetadataStore[T] {
-  def getMetadata(): Map[String, String]
+  def getMetadata(): mutable.HashMap[String, String]
 
-  def setMetadata(metadata: Map[String,String])
+  def setMetadata(metadata: mutable.HashMap[String,String])
 
-  def update(params: Map[String, String]): MetadataStore
+  def update(params: mutable.HashMap[String, Any]): MetadataStore
 
-  def update(params: Map[String, String], apiKey: String): MetadataStore
+  def update(params: mutable.HashMap[String, Any], apiKey: String): MetadataStore
 }

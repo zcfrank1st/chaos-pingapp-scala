@@ -1,6 +1,9 @@
 package com.chaos.pingplusplus.model
 
 import com.chaos.pingplusplus.net.APIResource
+import com.chaos.pingplusplus.net.APIResource.RequestMethod
+
+import scala.collection.mutable
 
 /**
  * Created by zcfrank1st on 11/17/14.
@@ -19,18 +22,17 @@ class Refund extends APIResource{
   var metadata: Map[String, String] = _
   var charge: String = _
 
-  def update(params: Map[String, AnyRef]): Refund = {
+  def update(params: mutable.HashMap[String, Any]): Refund = {
     update(params, null)
   }
 
-  def update(params: Map[String, AnyRef], apiKey:String) = {
-    request() // TODO
-    return new Refund()
+  def update(params: mutable.HashMap[String, Any], apiKey:String): Refund = {
+    APIResource.request(RequestMethod.POST, this getInstanceURL(), params, classOf[Refund], apiKey )
   }
 
   def getInstanceURL(): String ={
     if (this.charge != null) {
-      return String.format("%s/%s/refunds/%s", classURL(classOf[Charge]), this.charge, this.id)
+      return String.format("%s/%s/refunds/%s", APIResource.classUrl(Class[Charge]), this.charge, this.id)
     }
     null
   }

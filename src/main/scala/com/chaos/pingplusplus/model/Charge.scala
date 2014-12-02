@@ -1,10 +1,11 @@
 package com.chaos.pingplusplus.model
 
 import com.chaos.pingplusplus.net.APIResource
+import com.chaos.pingplusplus.net.APIResource.RequestMethod
 import com.google.gson._
 import java.lang.reflect.Type
-import collection.mutable.Map
 
+import scala.collection.mutable
 /**
  * Created by zcfrank1st on 11/17/14.
  */
@@ -31,7 +32,7 @@ class Charge extends APIResource with MetadataStore[Charge] {
   var amountRefunded: Integer = _
   var failureCode: String = _
   var failureMsg: String = _
-  var metadata: Map[String, String] = _
+  var metadata: mutable.HashMap[String, String] = _
   var credential: Map[String, AnyRef] = _
   var description: String = _
 
@@ -56,22 +57,8 @@ class Charge extends APIResource with MetadataStore[Charge] {
     refunds
   }
 
-  override def getMetadata(): Map[String, String] = metadata
-
-  override def update(params: Map[String, String]): MetadataStore = {
-    update(params, null)
-  }
-
-  override def update(params: Map[String, String], apiKey: String): MetadataStore = {
-
-  }
-
-  override def setMetadata(metadata: Map[String, String]): Unit = {
-    this.metadata = metadata
-  }
-
   def getCredential: String = {
-    val credParams: Map[String, AnyRef] = _
+    val credParams: mutable.HashMap[String, Any] = _
     if (channel == Channel.UPMP) {
       credParams.put(channel, credential.get(channel))
     }
@@ -83,5 +70,59 @@ class Charge extends APIResource with MetadataStore[Charge] {
     }
     PRETTY_PRINT_GSON.toJson(credParams)
   }
- //TODO
+
+  def create(params: mutable.HashMap[String, Any]): Charge = {
+    create(params, null)
+  }
+
+  def retrieve(id: String): Charge = {
+    retrieve(id, null)
+  }
+
+  def update(params: mutable.HashMap[String, Any]): Charge = {
+    update(params, null)
+  }
+
+  def all(params: mutable.HashMap[String, Any]): ChargeCollection = {
+    all(params, null)
+  }
+
+  def refund: Charge = {
+    this.refund(null, null)
+  }
+
+  def refund(params: mutable.HashMap[String, Any]): Charge = {
+    this.refund(params, null)
+  }
+
+  def create(params: mutable.HashMap[String, Any], apiKey: String): Charge = {
+    APIResource.request(RequestMethod.POST, APIResource.classUrl(Class[Charge]), params, classOf[Charge], apiKey)
+  }
+
+  def retrieve(id: String, apiKey: String): Charge = {
+    APIResource.request(RequestMethod.GET, APIResource.instanceURL(classOf[Charge], id), null, classOf[Charge], apiKey)
+  }
+
+  def update(params: mutable.HashMap[String, Any], apiKey: String): Charge = {
+    APIResource.request(RequestMethod.POST, APIResource.instanceURL(classOf[Charge], id), params, classOf[Charge], apiKey)
+  }
+
+  def all(params: mutable.HashMap[String, Any], apiKey: String): ChargeCollection = {
+    APIResource.request(RequestMethod.GET, APIResource.classUrl(Class[Charge]), params, classOf[ChargeCollection], apiKey)
+  }
+
+  def refund(apiKey: String): Charge = {
+    this.refund(null.asInstanceOf[mutable.HashMap[String, Any]], apiKey)
+  }
+
+  def refund(params: mutable.HashMap[String, Any], apiKey: String): Charge = {
+    APIResource.request(RequestMethod.POST, String.format("%s/refunds", APIResource.instanceURL(classOf[Charge], this.id)), params, classOf[Charge], apiKey)
+  }
+
+  override def getMetadata(): mutable.HashMap[String, String] = metadata
+
+  override def setMetadata(metadata: mutable.HashMap[String, String]): Unit = {
+    this.metadata = metadata
+  }
+
 }

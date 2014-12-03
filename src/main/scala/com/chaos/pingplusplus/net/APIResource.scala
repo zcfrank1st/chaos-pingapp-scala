@@ -11,7 +11,7 @@ import javax.net.ssl.HttpsURLConnection
 
 import com.chaos.pingplusplus.Pingpp
 import com.chaos.pingplusplus.exception.{APIConnectionException, APIException, AuthenticationException, InvalidRequestException}
-import com.chaos.pingplusplus.model.{ChargeRefundCollection, PingppObject, PingppRawJsonObject, PingppRawJsonObjectDeserializer}
+import com.chaos.pingplusplus.model._
 import com.chaos.pingplusplus.net.APIResource.RequestMethod.RequestMethod
 import com.google.gson.{FieldNamingPolicy, Gson, GsonBuilder}
 
@@ -29,7 +29,7 @@ class APIResource extends PingppObject {
 object APIResource {
   final val GSON: Gson = new GsonBuilder()
     .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-    .registerTypeAdapter(classOf[ChargeRefundCollection], new ChargeRefundCollection())
+    .registerTypeAdapter(classOf[ChargeRefundCollection], new ChargeRefundCollectionDeserializer())
     .registerTypeAdapter(classOf[PingppRawJsonObject], new PingppRawJsonObjectDeserializer())
     .create()
 

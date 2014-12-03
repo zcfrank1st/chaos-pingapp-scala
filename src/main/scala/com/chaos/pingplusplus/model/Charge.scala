@@ -36,7 +36,7 @@ class Charge extends APIResource with MetadataStore[Charge] {
   var credential: Map[String, AnyRef] = _
   var description: String = _
 
-  override final val PRETTY_PRINT_GSON = new GsonBuilder().
+  override val PRETTY_PRINT_GSON = new GsonBuilder().
     setPrettyPrinting().
     serializeNulls().
     disableHtmlEscaping().
@@ -45,7 +45,7 @@ class Charge extends APIResource with MetadataStore[Charge] {
     registerTypeAdapter(classOf[Double], new JsonSerializer[Double]() {
     def serialize(src: Double, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = {
       if (src == src.longValue) return new JsonPrimitive(src.longValue)
-      return new JsonPrimitive(src)
+      new JsonPrimitive(src)
     }
   }).
     create()
@@ -58,7 +58,7 @@ class Charge extends APIResource with MetadataStore[Charge] {
   }
 
   def getCredential: String = {
-    val credParams: mutable.HashMap[String, Any] = _
+    val credParams = new mutable.HashMap[String, Any]
     if (channel == Channel.UPMP) {
       credParams.put(channel, credential.get(channel))
     }
@@ -79,7 +79,7 @@ class Charge extends APIResource with MetadataStore[Charge] {
     retrieve(id, null)
   }
 
-  def update(params: mutable.HashMap[String, Any]): Charge = {
+  def update(params: mutable.HashMap[String, Any]) = {
     update(params, null)
   }
 
@@ -96,19 +96,19 @@ class Charge extends APIResource with MetadataStore[Charge] {
   }
 
   def create(params: mutable.HashMap[String, Any], apiKey: String): Charge = {
-    APIResource.request(RequestMethod.POST, APIResource.classUrl(Class[Charge]), params, classOf[Charge], apiKey)
+    APIResource.request(RequestMethod.POST, APIResource.classUrl(classOf[Charge]), params, classOf[Charge], apiKey)
   }
 
   def retrieve(id: String, apiKey: String): Charge = {
     APIResource.request(RequestMethod.GET, APIResource.instanceURL(classOf[Charge], id), null, classOf[Charge], apiKey)
   }
 
-  def update(params: mutable.HashMap[String, Any], apiKey: String): Charge = {
+  def update(params: mutable.HashMap[String, Any], apiKey: String) = {
     APIResource.request(RequestMethod.POST, APIResource.instanceURL(classOf[Charge], id), params, classOf[Charge], apiKey)
   }
 
   def all(params: mutable.HashMap[String, Any], apiKey: String): ChargeCollection = {
-    APIResource.request(RequestMethod.GET, APIResource.classUrl(Class[Charge]), params, classOf[ChargeCollection], apiKey)
+    APIResource.request(RequestMethod.GET, APIResource.classUrl(classOf[Charge]), params, classOf[ChargeCollection], apiKey)
   }
 
   def refund(apiKey: String): Charge = {

@@ -10,7 +10,7 @@ trait MetadataStore[T] {
 
   def setMetadata(metadata: mutable.HashMap[String,String])
 
-  def update(params: mutable.HashMap[String, Any]): MetadataStore
+  def update(params: mutable.HashMap[String, Any])
 
-  def update(params: mutable.HashMap[String, Any], apiKey: String): MetadataStore
+  def update(params: mutable.HashMap[String, Any], apiKey: String)
 }

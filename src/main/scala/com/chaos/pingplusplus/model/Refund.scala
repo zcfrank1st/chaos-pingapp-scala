@@ -32,7 +32,7 @@ class Refund extends APIResource{
 
   def getInstanceURL(): String ={
     if (this.charge != null) {
-      return String.format("%s/%s/refunds/%s", APIResource.classUrl(Class[Charge]), this.charge, this.id)
+      return String.format("%s/%s/refunds/%s", APIResource.classUrl(classOf[Charge]), this.charge, this.id)
     }
     null
   }

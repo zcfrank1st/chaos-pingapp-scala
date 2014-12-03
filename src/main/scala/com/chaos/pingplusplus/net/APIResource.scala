@@ -1,22 +1,22 @@
 package com.chaos.pingplusplus.net
 
-import java.io.{UnsupportedEncodingException, InputStream, OutputStream, IOException}
-import java.lang.reflect.{Method, Constructor}
-import java.net.{URLStreamHandler, URL, HttpURLConnection, URLEncoder}
+import java.io.{IOException, InputStream, OutputStream, UnsupportedEncodingException}
+import java.lang.reflect.{Constructor, Method}
+import java.net.{HttpURLConnection, URL, URLEncoder, URLStreamHandler}
+import java.security.cert.{Certificate, CertificateEncodingException}
 import java.security.{MessageDigest, NoSuchAlgorithmException}
-import java.security.cert.{CertificateEncodingException, Certificate}
 import java.util
 import java.util.Scanner
 import javax.net.ssl.HttpsURLConnection
 
 import com.chaos.pingplusplus.Pingpp
-import com.chaos.pingplusplus.exception.{AuthenticationException, APIException, InvalidRequestException, APIConnectionException}
-import com.chaos.pingplusplus.model.{PingppRawJsonObjectDeserializer, PingppRawJsonObject, ChargeRefundCollection, PingppObject}
+import com.chaos.pingplusplus.exception.{APIConnectionException, APIException, AuthenticationException, InvalidRequestException}
+import com.chaos.pingplusplus.model.{ChargeRefundCollection, PingppObject, PingppRawJsonObject, PingppRawJsonObjectDeserializer}
 import com.chaos.pingplusplus.net.APIResource.RequestMethod.RequestMethod
-import com.google.gson.{FieldNamingPolicy, GsonBuilder, Gson}
+import com.google.gson.{FieldNamingPolicy, Gson, GsonBuilder}
 
-import scala.collection.mutable
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 /**
  * Created by zcfrank1st on 11/14/14.
@@ -125,7 +125,7 @@ object APIResource {
         val customHandler: URLStreamHandler = constructor.newInstance()
         pingppURL = new URL(null, url, customHandler)
       } catch {
-        case ex: _ => throw new IOException(ex)
+        case ex: IOException => throw new IOException(ex)
       }
     } else {
       pingppURL = new URL(url)
@@ -253,7 +253,7 @@ object APIResource {
         val nestedMap: Map[_, _] = value.asInstanceOf[Map[_, _]]
         import scala.collection.JavaConversions._
         for (nestedEntry <- nestedMap.entrySet) {
-          flatNestedMap.put(String.format("%s[%s]", key, nestedEntry.getKey), nestedEntry.getValue)
+          flatNestedMap.put("%s[%s]".format(key, nestedEntry.getKey), nestedEntry.getValue)
         }
         flatParams.putAll(flattenParams(flatNestedMap))
       }
@@ -289,7 +289,7 @@ object APIResource {
 
   private def makeURLConnectionRequest(method: RequestMethod, url: String, query: String, apiKey: String): PingppResponse = {
     var conn: HttpURLConnection = null
-    try
+    try {
       method match {
         case RequestMethod.GET =>
           conn = createGetConnection(url, query, apiKey)
@@ -311,7 +311,7 @@ object APIResource {
       }
       headers = conn.getHeaderFields
       new PingppResponse(rCode, rBody, headers)
-
+    }
     catch {
       case e: IOException => {
         throw new APIConnectionException(String.format("IOException during API request to Pingpp (%s): %s " + "Please check your internet connection and try again. If this problem persists," + "you should check Pingpp's service status at https://pingplusplus.com," + " or let us know at support@pingplusplus.com.", Pingpp.apiBase, e.getMessage), e)
@@ -405,10 +405,10 @@ object APIResource {
 
   private def makeAppEngineRequest(method: RequestMethod, url: String, query: String, apiKey: String): PingppResponse = {
     val unknownErrorMessage: String = "Sorry, an unknown error occurred while trying to use the " + "Google App Engine runtime. Please contact support@pingplusplus.com for assistance."
-    var url = url
-    try
+    var url1: String = url
+    try {
       if (method == RequestMethod.GET || method == RequestMethod.DELETE) {
-        url = String.format("%s?%s", url, query)
+        url1 = String.format("%s?%s", url1, query)
       }
       val fetchURL: URL = new URL(url)
       val requestMethodClass: Class[_] = Class.forName("com.google.appengine.api.urlfetch.HTTPMethod")
@@ -425,7 +425,7 @@ object APIResource {
         }
       }
       val fetchOptionsClass: Class[_] = Class.forName("com.google.appengine.api.urlfetch.FetchOptions")
-      fetchOptionsClass.getDeclaredMethod("setDeadline", classOf[Double]).invoke(fetchOptions, 55.toDouble)
+      fetchOptionsClass.getDeclaredMethod("setDeadline", classOf[Double]).invoke(fetchOptions, 55.toDouble.asInstanceOf[Object])
       val requestClass: Class[_] = Class.forName("com.google.appengine.api.urlfetch.HTTPRequest")
       val request: Any = requestClass.getDeclaredConstructor(classOf[URL], requestMethodClass, fetchOptionsClass).newInstance(fetchURL, httpMethod, fetchOptions)
       if (method == RequestMethod.POST) {
@@ -435,19 +435,19 @@ object APIResource {
       for (header <- getHeaders(apiKey).entrySet) {
         val httpHeaderClass: Class[_] = Class.forName("com.google.appengine.api.urlfetch.HTTPHeader")
         val reqHeader: Any = httpHeaderClass.getDeclaredConstructor(classOf[String], classOf[String]).newInstance(header.getKey, header.getValue)
-        requestClass.getDeclaredMethod("setHeader", httpHeaderClass).invoke(request, reqHeader)
+        requestClass.getDeclaredMethod("setHeader", httpHeaderClass).invoke(request, reqHeader.asInstanceOf[Object])
       }
       val urlFetchFactoryClass: Class[_] = Class.forName("com.google.appengine.api.urlfetch.URLFetchServiceFactory")
       val urlFetchService: AnyRef = urlFetchFactoryClass.getDeclaredMethod("getURLFetchService").invoke(null)
       val fetchMethod: Method = urlFetchService.getClass.getDeclaredMethod("fetch", requestClass)
       fetchMethod.setAccessible(true)
-      val response: AnyRef = fetchMethod.invoke(urlFetchService, request)
+      val response: AnyRef = fetchMethod.invoke(urlFetchService, request.asInstanceOf[Object])
       val responseCode: Int = response.getClass.getDeclaredMethod("getResponseCode").invoke(response).asInstanceOf[Integer]
       val body: String = new String(response.getClass.getDeclaredMethod("getContent").invoke(response).asInstanceOf[Array[Byte]], CHARSET)
-      return new PingppResponse(responseCode, body)
-
+      new PingppResponse(responseCode, body)
+    }
     catch {
-      case e: _ => {
+      case e: APIException => {
         throw new APIException(unknownErrorMessage, e)
       }
     }

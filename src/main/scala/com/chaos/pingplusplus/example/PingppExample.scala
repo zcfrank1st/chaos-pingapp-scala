@@ -1,5 +1,4 @@
-import com.chaos.pingplusplus.Pingpp
-import com.chaos.pingplusplus.model.{Charge, Channel}
+import com.chaos.pingplusplus.model.{Channel, Charge}
 
 import scala.collection.mutable
 
@@ -10,7 +9,6 @@ object PingppExample {
   private var chargeID: String = null
 
   def main(args: Array[String]) {
-    Pingpp.apiKey = "sk_test_LGyXvHaDaDOSTOizTG5GOqPO"
     charge
   }
 
@@ -25,10 +23,10 @@ object PingppExample {
     chargeMap.put("channel", Channel.WECHAT)
     chargeMap.put("client_ip", "127.0.0.1")
     val app = new mutable.HashMap[String, String]
-    app.put("id", "YOUR-APP-ID")
+    app.put("id", "YOUR ID")
     chargeMap.put("app", app)
     try {
-      val charge: Charge = new Charge().create(chargeMap)
+      val charge: Charge = Charge.create(chargeMap)
       chargeID = charge.id
       System.out.println(chargeID)
       System.out.println(charge)
@@ -44,7 +42,7 @@ object PingppExample {
 
   def refund {
     try {
-      val charge: Charge = new Charge().retrieve("CHARGE-ID")
+      val charge: Charge = Charge.retrieve("CHARGE-ID")
       val refundMap = new mutable.HashMap[String, Any]
       refundMap.put("amount", 100)
       refundMap.put("description", "小苹果")

@@ -1,14 +1,41 @@
 package com.chaos.pingplusplus.model
 
+import java.lang.reflect.Type
+
 import com.chaos.pingplusplus.net.APIResource
 import com.chaos.pingplusplus.net.APIResource.RequestMethod
 import com.google.gson._
-import java.lang.reflect.Type
 
 import scala.collection.mutable
 /**
  * Created by zcfrank1st on 11/17/14.
  */
+object Charge {
+  def create(params: mutable.HashMap[String, Any]): Charge = {
+    create(params, null)
+  }
+
+  def retrieve(id: String): Charge = {
+    retrieve(id, null)
+  }
+
+  def all(params: mutable.HashMap[String, Any]): ChargeCollection = {
+    all(params, null)
+  }
+
+  def create(params: mutable.HashMap[String, Any], apiKey: String): Charge = {
+    APIResource.request(RequestMethod.POST, APIResource.classUrl(classOf[Charge]), params, classOf[Charge], apiKey)
+  }
+
+  def retrieve(id: String, apiKey: String): Charge = {
+    APIResource.request(RequestMethod.GET, APIResource.instanceURL(classOf[Charge], id), null, classOf[Charge], apiKey)
+  }
+
+  def all(params: mutable.HashMap[String, Any], apiKey: String): ChargeCollection = {
+    APIResource.request(RequestMethod.GET, APIResource.classUrl(classOf[Charge]), params, classOf[ChargeCollection], apiKey)
+  }
+}
+
 class Charge extends APIResource with MetadataStore[Charge] {
   var id: String = _
   var obj: String = _
@@ -45,7 +72,7 @@ class Charge extends APIResource with MetadataStore[Charge] {
     registerTypeAdapter(classOf[Double], new JsonSerializer[Double]() {
     def serialize(src: Double, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = {
       if (src == src.longValue) return new JsonPrimitive(src.longValue)
-      new JsonPrimitive(src)
+      return new JsonPrimitive(src)
     }
   }).
     create()
@@ -71,21 +98,12 @@ class Charge extends APIResource with MetadataStore[Charge] {
     PRETTY_PRINT_GSON.toJson(credParams)
   }
 
-  def create(params: mutable.HashMap[String, Any]): Charge = {
-    create(params, null)
-  }
 
-  def retrieve(id: String): Charge = {
-    retrieve(id, null)
-  }
 
   def update(params: mutable.HashMap[String, Any]) = {
     update(params, null)
   }
 
-  def all(params: mutable.HashMap[String, Any]): ChargeCollection = {
-    all(params, null)
-  }
 
   def refund: Charge = {
     this.refund(null, null)
@@ -95,20 +113,8 @@ class Charge extends APIResource with MetadataStore[Charge] {
     this.refund(params, null)
   }
 
-  def create(params: mutable.HashMap[String, Any], apiKey: String): Charge = {
-    APIResource.request(RequestMethod.POST, APIResource.classUrl(classOf[Charge]), params, classOf[Charge], apiKey)
-  }
-
-  def retrieve(id: String, apiKey: String): Charge = {
-    APIResource.request(RequestMethod.GET, APIResource.instanceURL(classOf[Charge], id), null, classOf[Charge], apiKey)
-  }
-
   def update(params: mutable.HashMap[String, Any], apiKey: String) = {
     APIResource.request(RequestMethod.POST, APIResource.instanceURL(classOf[Charge], id), params, classOf[Charge], apiKey)
-  }
-
-  def all(params: mutable.HashMap[String, Any], apiKey: String): ChargeCollection = {
-    APIResource.request(RequestMethod.GET, APIResource.classUrl(classOf[Charge]), params, classOf[ChargeCollection], apiKey)
   }
 
   def refund(apiKey: String): Charge = {

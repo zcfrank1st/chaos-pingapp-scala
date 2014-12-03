@@ -131,7 +131,7 @@ object APIResource {
       pingppURL = new URL(url)
     }
 
-    val conn = pingppURL.openConnection().asInstanceOf[HttpURLConnection]
+    val conn: HttpURLConnection = pingppURL.openConnection().asInstanceOf[HttpURLConnection]
     conn.setConnectTimeout(30 * 1000)
     conn.setReadTimeout(80 * 1000)
     conn.setUseCaches(false)
@@ -208,7 +208,7 @@ object APIResource {
 
     try {
       output = conn.getOutputStream
-      output.write(query.toByte)
+      output.write(query.getBytes(CHARSET))
       conn
     } finally {
       if (output != null) {
@@ -303,7 +303,7 @@ object APIResource {
       val rCode: Int = conn.getResponseCode
       var rBody: String = null
       var headers: mutable.Map[String, util.List[String]] = null
-      if (rCode >= 200 && rCode < 300) {
+       if (rCode >= 200 && rCode < 300) {
         rBody = getResponseBody(conn.getInputStream)
       }
       else {
@@ -350,7 +350,7 @@ object APIResource {
   }
 
   def _request[T](method: RequestMethod, url: String, params: mutable.HashMap[String, Any], clazz: Class[T], apiKey: String): T = {
-    var apiKey = Pingpp.apiKey;
+    var apiKey = Pingpp.apiKey
     if ((Pingpp.apiKey == null || Pingpp.apiKey.length == 0) && (apiKey == null || apiKey.length == 0)) {
       throw new AuthenticationException("No API key provided. (HINT: set your API key using 'Pingpp.apiKey = <API-KEY>'. " + "You can generate API keys from the Pingpp web interface. " + "See https://pingplusplus.com for details or email support@pingplusplus.com if you have questions.")
     }

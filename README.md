@@ -3,6 +3,6 @@ chaos-pingapp-scala
 
 a scala version of ping++ sdk
 
-通过scala简化代码，demo可以写多个版本：scala， java， clojure， groovy
+由于时间比较紧张，简单用scala重写了一下java版的sdk~
 
-主要核心： 简化代码，打包gradle脚本实现
+主要核心： 尽量简化代码，gradle构建

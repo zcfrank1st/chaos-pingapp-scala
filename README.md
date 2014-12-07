@@ -1,4 +1,4 @@
-chaos-pingapp-scala
+chaos-pingpp-scala
 ===================
 
 a scala version of ping++ sdk
